@@ -37,7 +37,13 @@ class Chef
 						:short	=> "-y",
 						:long	=> "--yes",
 						:description	=> "Assume yes on all questions (USE WITH CAUTION!)",
-						:proc   => Proc.new { |key| Chef::Config[:knife][:force_yes] = yes }
+						:proc   => Proc.new { |key| Chef::Config[:knife][:force_yes] = force }
+
+					option :dry_run,
+						:short	=> "-d",
+						:long	=> "--dry-run",
+						:description	=> "Run the command without actually affecting anything",
+						:proc   => Proc.new { |key| Chef::Config[:knife][:dry_run] = dry }
 
 				end
 			end
