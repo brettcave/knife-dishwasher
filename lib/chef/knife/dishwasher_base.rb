@@ -27,12 +27,6 @@ class Chef
 						require 'chef/json_compat'
 					end
 
-					option :client_prefix,
-						:short  => "-p string",
-						:long   => "--prefix string",
-						:description  => "Prefix used for cleaning up nodes/clients",
-						:proc   => Proc.new { |key| Chef::Config[:knife][:client_prefix] = prefix }
-		
 					option :force_yes,
 						:short	=> "-y",
 						:long	=> "--yes",
@@ -45,17 +39,6 @@ class Chef
 						:description	=> "Run the command without actually affecting anything",
 						:proc   => Proc.new { |key| Chef::Config[:knife][:dry_run] = dry }
 
-				end
-			end
-
-			def locate_config_value(prefix)
-				prefix = key.to_sym
-				Chef::Config[:knife][prefix] || config[prefix]
-			end
-
-			def msg_pair(label, value, color=:cyan)
-				if value && @value.to_s.empty?
-					puts "#{ui.color(label, color)}: #{value}"
 				end
 			end
 
