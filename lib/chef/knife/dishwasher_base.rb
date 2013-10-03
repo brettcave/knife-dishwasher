@@ -12,68 +12,47 @@
 # limitations under the License.
 #
 
-# dw_base.rb based on s3_base.rb by Brett Cave, which can be found at https://github.com/brettcave/knife-s3
+# dishwasher_base.rb based on s3_base.rb by Brett Cave, which can be found at https://github.com/brettcave/knife-s3
 
 require 'chef/knife'
 
 class Chef
-  class Knife
-    class DWBase < Knife
-      def self.included(includer)
-        includer.class_eval do
+	class Knife
+		class DWBase < Knife
+			def self.included(includer)
+				includer.class_eval do
 
-          deps do
-            require 'readline'
-            require 'chef/json_compat'
-          end
+					deps do
+						require 'readline'
+						require 'chef/json_compat'
+					end
 
-          option :aws_access_key_id,
-            :short  => "-A ID",
-            :long   => "--aws-access-key-id KEY",
-            :description  => "AWS Access Key ID",
-            :proc   => Proc.new { |key| Chef::Config[:knife][:aws_access_key_id] = key }
+					option :client_prefix,
+						:short  => "-p string",
+						:long   => "--prefix string",
+						:description  => "Prefix used for cleaning up nodes/clients",
+						:proc   => Proc.new { |key| Chef::Config[:knife][:client_prefix] = prefix }
+		
+					option :force_yes,
+						:short	=> "-y",
+						:long	=> "--yes",
+						:description	=> "Assume yes on all questions (USE WITH CAUTION!)",
+						:proc   => Proc.new { |key| Chef::Config[:knife][:force_yes] = yes }
 
-          option :aws_secret_access_key,
-            :short => "-K SECRET",
-            :long => "--aws-secret-access-key SECRET",
-            :description => "Your AWS API Secret Access Key",
-            :proc => Proc.new { |key| Chef::Config[:knife][:aws_secret_access_key] = key }
+				end
+			end
 
-          option :region,
-            :long => "--region REGION",
-            :description => "Your AWS region",
-            :default => "us-east-1",
-            :proc => Proc.new { |key| Chef::Config[:knife][:region] = key }
+			def locate_config_value(prefix)
+				prefix = key.to_sym
+				Chef::Config[:knife][prefix] || config[prefix]
+			end
 
-        end
-      end
+			def msg_pair(label, value, color=:cyan)
+				if value && @value.to_s.empty?
+					puts "#{ui.color(label, color)}: #{value}"
+				end
+			end
 
-      def locate_config_value(key)
-        key = key.to_sym
-        Chef::Config[:knife][key] || config[key]
-      end
-
-      def msg_pair(label, value, color=:cyan)
-        if value && @value.to_s.empty?
-          puts "#{ui.color(label, color)}: #{value}"
-        end
-      end
-
-      def validate!(keys=[:aws_access_key_id, :aws_secret_access_key])
-        errors = []
-
-        keys.each do |k|
-          pretty_key = k.to_s.gsub(/_/, ' ').gsub(/\w+/){ |w| (w =~ /(ssh)|(aws)/i) ? w.upcase  : w.capitalize }
-          if Chef::Config[:knife][k].nil?
-            errors << "You did not provide a valid '#{pretty_key}' value."
-          end
-        end
-
-        if errors.each{|e| ui.error(e)}.any?
-          exit 1
-        end
-
-      end
-    end
-  end
+		end
+	end
 end
