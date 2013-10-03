@@ -7,11 +7,9 @@ class Chef
 
 			deps do
 				require 'readline'
-				require 'chef/knife/essentials'
-				Chef::Knife::Essentials.load_deps
 			end
 
-			banner "knife dishwasher clean --with-clients { --prefix <prefix> OR --time <integer> [ --dry-run ] [ --force-yes ]"
+			banner "knife dishwasher clean { --prefix <prefix> OR --time <integer> } [ --dry-run ] [ --force-yes ] [ --with-clients ]"
 
 			option :clients,
 				:short	=> "-wc",
@@ -50,9 +48,22 @@ class Chef
 				end
 
 				begin
+					if config[:time] + config[:prefix].nil
+						time = Time.now
+						t = time.to_i
 
+						for node in Chef::Knife::Node.list
+							puts #{node}
+						end
+					end
 
-
-
-
-
+					if config[:prefix] + config[:time].nil
+						for node in Chef::Knife::Node.list
+							puts #{node}
+						end
+					end
+				end
+			end
+		end
+	end
+end
