@@ -6,7 +6,8 @@ class Chef
 		class DWClean < Chef::Knife::DWBase
 
 			deps do
-				require 'readline'
+				require 'readline',
+				require'chef/search/query'
 			end
 
 			banner "knife dishwasher clean { --prefix <prefix> OR --time <integer> } [ --dry-run ] [ --force-yes ] [ --with-clients ]"
@@ -18,7 +19,7 @@ class Chef
 
 			option :prefix,
 				:short	=> "-p",
-				:long => "--prefix",
+				:long	=> "--prefix",
 				:description	=> "Purge nodes by prefix."
 
 			option :time,
@@ -49,17 +50,33 @@ class Chef
 
 				begin
 					if config[:time] + config[:prefix].nil
-						time = Time.now
-						t = time.to_i
+						ui.msg "Finding all nodes and indexing OHAI_TIME attribute"
+						for node in Chef::Knife::NodeList
+							query = "attribute:ohai_time"
+							query_nodes.search('node', query) do |node_item|
+								delta = Time.now.to_i - node_item.ohai_time.round
+								if delta > config[:time]
+									Chef::Knife::NodeDelete
+									if config[:clients]
+										Chef::Knife::ClientDelete
+									end
+								end
+							end
 
-						for node in Chef::Knife::Node.list
-							puts #{node}
 						end
 					end
 
 					if config[:prefix] + config[:time].nil
-						for node in Chef::Knife::Node.list
-							puts #{node}
+						ui.msg "Finding all nodes by prefix"
+						for node in Chef::Knife::NodeList
+							query = config[:prefix]
+							query_nodes.search('node', query); do |node_item|
+								@knife:name_args = node_item.name
+								Chef::Knife::NodeDelete
+								if config[:clients]
+									Chef::Knife::ClientDelete
+								end
+							end
 						end
 					end
 				end
