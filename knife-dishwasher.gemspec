@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.author = "Stephen Coetzee"
   s.description = "Tool for cleaning unused chef clients and nodes."
   s.email = "sacoetzee@gmail.com"
-  s.homepage = 'https://github.com/stephencoetzee/knife-diskwasher'
+  s.homepage = 'https://github.com/stephencoetzee/knife-dishwasher'
   s.files = Dir["lib/**/*"]
   s.rubygems_version = "1.6.2"
   s.license = "Apache 2.0"
